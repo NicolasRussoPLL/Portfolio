@@ -2,6 +2,8 @@ import discord
 import logging
 import os
 import requests
+from urllib.parse import urlencode
+from urllib.parse import urlparse
 
 # 📌 Configurar el logger
 logging.basicConfig(
@@ -63,5 +65,5 @@ async def auth(interaction: discord.Interaction):
     await interaction.response.send_message(f"🔐 Para autorizar el bot, haz clic en el siguiente enlace:\n{auth_link}")
 
 # 📌 Ejecutar el bot
-TOKEN = ""  # Reemplaza con tu token de bot
+TOKEN = "MTM0MTIzNTUxMDQ3MDkwNTkxNw.GMwbzL.0YnfAgK8DhXK5vWiBwJJ_jGVbc_3oxvev_iUHU"  # Reemplaza con tu token de bot / token de prueba
 bot.run(TOKEN)
