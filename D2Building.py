@@ -28,9 +28,9 @@ BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY", "46f5b80f36584f779f56017a4b76a647")
 BUNGIE_REDIRECT_URL = os.getenv("BUNGIE_REDIRECT_URL", "https://oauth.pstmn.io/v1/browser-callback")
 BUNGIE_CLIENT_ID = os.getenv("BUNGIE_CLIENT_ID", "49012")
 BUNGIE_AUTH_URL = os.getenv("BUNGIE_AUTH_URL", "https://www.bungie.net/es/OAuth/Authorize")
-BUNGIE_TOKEN_URL = os.getenv("BUNGIE_TOKEN_URL", "https://www.bungie.net/Platform/Destiny2/Auth/Token")
+BUNGIE_TOKEN_URL = os.getenv("BUNGIE_TOKEN_URL", "https://www.bungie.net/platform/app/oauth/token/")
 
-HEADERS = {"X-API-KEY": BUNGIE_API_KEY}
+HEADERS = {"X-API-KEY": BUNGIE_API_KEY, "Content-Type": "application/x-www-form-urlencoded"}
 
 
 
@@ -66,11 +66,12 @@ async def auth(interaction: discord.Interaction):
 
 @tree.command(name="get_token", description="Proporciona el código de autorización para obtener el token de acceso")
 async def get_token(interaction: discord.Interaction, code: str):
-    # El 'code' es el parámetro que el usuario deberá copiar desde la URL de redirección y enviar al bot
-    if not code:
-        await interaction.response.send_message("🔴 Error: Por favor, proporciona el código de autorización.", ephemeral=True)
-        return
+    await interaction.response.defer(ephemeral=True)  # Evita timeout
 
+    if not code:
+        await interaction.followup.send("🔴 Error: Por favor, proporciona el código de autorización.", ephemeral=True)
+        return
+    
     # Datos necesarios para hacer la solicitud de intercambio del código por el token
     data = {
         "client_id": BUNGIE_CLIENT_ID,
@@ -80,18 +81,28 @@ async def get_token(interaction: discord.Interaction, code: str):
     }
 
     # Realiza la solicitud POST para obtener el token de acceso
-    response = requests.post(BUNGIE_TOKEN_URL, data=data)
-    response_data = response.json()
+    response = requests.post(BUNGIE_TOKEN_URL, data=data, headers=HEADERS)
 
-    if response.status_code == 200:
-        access_token = response_data["access_token"]
-        refresh_token = response_data["refresh_token"]
+    try:
+        response_data = response.json()
+    except ValueError as e:
+        await interaction.followup.send(f"❌ Error al procesar la respuesta JSON: {str(e)}", ephemeral=True)
+        return
 
-        # Puedes almacenar el token de acceso de manera segura aquí
-        await interaction.response.send_message(f"🔑 Token de acceso obtenido con éxito:\n{access_token}", ephemeral=True) #Por cambiar
+    if response.status_code == 200 and "access_token" in response_data:
+        access_token = response_data.get("access_token")
+        refresh_token = response_data.get("refresh_token", "No disponible")
+        membership_id = response_data.get("membership_id", "Desconocido")  
+
+        try:
+            await interaction.user.send(f"✅ Autenticación exitosa. Token guardado.\nTu ID de Bungie: {membership_id}")
+            await interaction.followup.send("📩 Te envié un mensaje privado con la información.", ephemeral=True)
+        except discord.Forbidden:
+            await interaction.followup.send("⚠ No pude enviarte un mensaje privado. Asegúrate de tener los DMs activados.", ephemeral=True)
+    
     else:
-        await interaction.response.send_message(f"❌ Error al obtener el token: {response_data}", ephemeral=True)
-
+        error_msg = response_data.get("error_description", "Error desconocido.")
+        await interaction.followup.send(f"❌ Error en la autenticación: {error_msg}", ephemeral=True)
 
 # 📌 Ejecutar el bot
 TOKEN = "MTM0MTIzNTUxMDQ3MDkwNTkxNw.GMwbzL.0YnfAgK8DhXK5vWiBwJJ_jGVbc_3oxvev_iUHU"  # Reemplaza con tu token de bot / token de prueba
