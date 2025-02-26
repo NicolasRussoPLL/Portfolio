@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from discord import app_commands
 from discord.ui import View, Select
 import time
-
+import webserver
 
 # 📌 Configurar el logger
 logging.basicConfig(
@@ -34,6 +34,8 @@ BUNGIE_CLIENT_ID = os.getenv("BUNGIE_CLIENT_ID", "49012")
 BUNGIE_AUTH_URL = os.getenv("BUNGIE_AUTH_URL", "https://www.bungie.net/es/OAuth/Authorize")
 BUNGIE_TOKEN_URL = os.getenv("BUNGIE_TOKEN_URL", "https://www.bungie.net/platform/app/oauth/token/")
 BUNGIE_BASE_URL = os.getenv("BUNGIE_BASE_URL", "https://www.bungie.net/Platform")
+
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "MTM0MDAyNjAyNTY4MTIyNzg3Nw.GuIfAw.lfm4sM_andC6ZLGOOU15eMDzgTiEgEO4L8ocT4")
 
 HEADERS = {"X-API-KEY": BUNGIE_API_KEY, "Content-Type": "application/x-www-form-urlencoded"}
 
@@ -221,5 +223,5 @@ async def meta(interaction: discord.Interaction):
     await interaction.response.send_message("Selecciona una actividad para ver las builds meta:", view=ActivitySelect())
 
 # 📌 Ejecutar el bot
-TOKEN = "MTM0MTIzNTUxMDQ3MDkwNTkxNw.GMwbzL.0YnfAgK8DhXK5vWiBwJJ_jGVbc_3oxvev_iUHU"  # Reemplaza con tu token de bot / token de prueba
-bot.run(TOKEN)
+webserver.keep_alive()
+bot.run(DISCORD_TOKEN)
