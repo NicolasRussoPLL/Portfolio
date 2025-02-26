@@ -131,7 +131,7 @@ async def get_token(interaction: discord.Interaction, code: str):
         
         user_tokens[interaction.user.id] = {
             "access_token": response_data["access_token"],
-            "refresh_token": response_data["refresh_token"],
+            "refresh_token": response_data.get("refresh_token", "No disponible"),
             "expires_in": time.time() + response_data["expires_in"]
         }
 
