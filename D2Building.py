@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ui import View, Select
 import time
 import webserver
+import asyncio
 
 # 📌 Configurar el logger
 logging.basicConfig(
@@ -30,7 +31,7 @@ tree = discord.app_commands.CommandTree(bot)  # Sistema de Slash Commands
 
 BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY")
 BUNGIE_REDIRECT_URL = os.getenv("BUNGIE_REDIRECT_URL")
-BUNGIE_CLIENT_ID = os.getenv("BUNGIE_CLIENT_ID")
+BUNGIE_CLIENT_ID = os.getenv("BUNGIE_CLIENT_ID", "49012")
 BUNGIE_AUTH_URL = os.getenv("BUNGIE_AUTH_URL")
 BUNGIE_TOKEN_URL = os.getenv("BUNGIE_TOKEN_URL")
 BUNGIE_BASE_URL = os.getenv("BUNGIE_BASE_URL")
@@ -112,6 +113,7 @@ async def get_token(interaction: discord.Interaction, code: str):
 
     # Realiza la solicitud POST para obtener el token de acceso
     response = requests.post(BUNGIE_TOKEN_URL, data=data, headers=HEADERS)
+    await asyncio.sleep(1)  # Esperar para evitar spam
 
     try:
         response_data = response.json()
@@ -121,8 +123,11 @@ async def get_token(interaction: discord.Interaction, code: str):
 
     if response.status_code == 200 and "access_token" in response_data:
         access_token = response_data.get("access_token")
+        await asyncio.sleep(1)  # Esperar para evitar spam
         refresh_token = response_data.get("refresh_token", "No disponible")
-        membership_id = response_data.get("membership_id", "Desconocido")  
+        await asyncio.sleep(1)  # Esperar para evitar spam
+        membership_id = response_data.get("membership_id", "Desconocido")
+        await asyncio.sleep(1)  # Esperar para evitar spam
         
         user_tokens[interaction.user.id] = {
             "access_token": response_data["access_token"],
@@ -136,6 +141,7 @@ async def get_token(interaction: discord.Interaction, code: str):
     
     else:
         error_msg = response_data.get("error_description", "Error desconocido.")
+        await asyncio.sleep(1)  # Esperar para evitar spam
         await interaction.followup.send(f"❌ Error en la autenticación: {error_msg}", ephemeral=True)
 
 @tree.command(name="stat", description="Muestra estadísticas generales del jugador autenticado")
@@ -153,6 +159,7 @@ async def stat(interaction: discord.Interaction):
     # Obtener el membership_id del usuario
     profile_url = f"{BUNGIE_API_BASE}/Destiny2/254/Profile/{user_id}/?components=100"
     profile_response = requests.get(profile_url, headers=headers)
+    await asyncio.sleep(1)  # Esperar para evitar spam
     profile_data = profile_response.json()
     
     if "ErrorCode" in profile_data and profile_data["ErrorCode"] != 1:
@@ -165,18 +172,25 @@ async def stat(interaction: discord.Interaction):
     # Obtener estadísticas del usuario
     stats_url = f"{BUNGIE_API_BASE}/Destiny2/{membership_type}/Account/{membership_id}/Stats/"
     stats_response = requests.get(stats_url, headers=headers)
+    await asyncio.sleep(1)  # Esperar para evitar spam
     stats_data = stats_response.json()
     
     if "ErrorCode" in stats_data and stats_data["ErrorCode"] != 1:
         await interaction.response.send_message("❌ Error al obtener estadísticas.", ephemeral=True)
+        await asyncio.sleep(1)  # Esperar para evitar spam
         return
     
     # Extraer datos relevantes
     all_time_stats = stats_data["Response"]["mergedAllCharacters"]["results"]["allPvE"]["allTime"]
+    await asyncio.sleep(1)  # Esperar para evitar spam
     kills = all_time_stats["kills"]["basic"]["value"]
+    await asyncio.sleep(1)  # Esperar para evitar spam
     kd_ratio = all_time_stats["killsDeathsRatio"]["basic"]["value"]
+    await asyncio.sleep(1)  # Esperar para evitar spam
     pvp_wins = stats_data["Response"]["mergedAllCharacters"]["results"]["allPvP"]["allTime"]["activitiesWon"]["basic"]["value"]
+    await asyncio.sleep(1)  # Esperar para evitar spam
     raids_completed = stats_data["Response"]["mergedAllCharacters"]["results"]["raid"]["allTime"]["activitiesCleared"]["basic"]["value"]
+    await asyncio.sleep(1)  # Esperar para evitar spam
     
     # Responder con las estadísticas
     embed = discord.Embed(title="📊 Tus estadísticas generales", color=discord.Color.blue())
