@@ -28,14 +28,14 @@ intents = discord.Intents.all()  # Activa todos los intents para máxima compati
 bot = discord.Client(intents=intents)  # Cliente de Discord
 tree = discord.app_commands.CommandTree(bot)  # Sistema de Slash Commands
 
-BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY", "46f5b80f36584f779f56017a4b76a647")
-BUNGIE_REDIRECT_URL = os.getenv("BUNGIE_REDIRECT_URL", "https://oauth.pstmn.io/v1/browser-callback")
-BUNGIE_CLIENT_ID = os.getenv("BUNGIE_CLIENT_ID", "49012")
-BUNGIE_AUTH_URL = os.getenv("BUNGIE_AUTH_URL", "https://www.bungie.net/es/OAuth/Authorize")
-BUNGIE_TOKEN_URL = os.getenv("BUNGIE_TOKEN_URL", "https://www.bungie.net/platform/app/oauth/token/")
-BUNGIE_BASE_URL = os.getenv("BUNGIE_BASE_URL", "https://www.bungie.net/Platform")
+BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY")
+BUNGIE_REDIRECT_URL = os.getenv("BUNGIE_REDIRECT_URL")
+BUNGIE_CLIENT_ID = os.getenv("BUNGIE_CLIENT_ID")
+BUNGIE_AUTH_URL = os.getenv("BUNGIE_AUTH_URL")
+BUNGIE_TOKEN_URL = os.getenv("BUNGIE_TOKEN_URL")
+BUNGIE_BASE_URL = os.getenv("BUNGIE_BASE_URL")
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "MTM0MDAyNjAyNTY4MTIyNzg3Nw.GuIfAw.lfm4sM_andC6ZLGOOU15eMDzgTiEgEO4L8ocT4")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 HEADERS = {"X-API-KEY": BUNGIE_API_KEY, "Content-Type": "application/x-www-form-urlencoded"}
 
